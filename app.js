@@ -6,6 +6,7 @@ var logger = require('morgan');
 
 var userRouter = require('./routes/user');
 var adminRouter = require('./routes/admin');
+var db = require('./config/connection')
 
 const expressLayouts = require('express-ejs-layouts')
 
@@ -24,8 +25,15 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+db.connect((err)=>{
+
+  if(err) console.log("Connection Error"+err);
+  else console.log("Database Connected");
+})
+
 app.use('/', userRouter);
 app.use('/admin', adminRouter);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -2,9 +2,8 @@
     <div class="container pt-4">
         <div class="d-flex justify-content-between">
             <h2>User <b>Details</b></h2>
-            <button class="btn btn-primary "><i class="fas fa-plus"></i></button>
         </div>
-        <table class="table">
+        <table class="table" id="table">
             <thead class="table-dark">
                 <tr>
                     <th scope="col">#</th>
@@ -17,20 +16,96 @@
             <tbody>
 
                 <%for(var i=0;i<users.length;i++){%>
-                    <tr>
+                    <tr id="demo<%= users[i].name %>">
                         <th scope="row"><%=[i+1]%></th>
-                        <td><%=users[i].name%></td>
-                        <td><%=users[i].username%></td>
-                        <td><%=users[i].password%></td>
+                        <td><%=users[i].newname%></td>
+                        <td><%=users[i].newusername%></td>
+                        <td><%=users[i].newpass%></td>
                         <td>
-                            <a href=""><i class="fas fa-trash"></i></a>
-                            <a class="p-4" href=""><i class="fas fa-ban"></i></i></a>
-                            <a href=""><i class="fas fa-pencil-alt"></i></i></a>
+                            <a class="p-2" href="" id="delete"  onclick="deleteuser('<%=users[i]._id%>')"><i class="fas fa-trash"></i></a>
+                            <a class="p-2" href="" id="block"><i class="fas fa-ban"></i></i></a>
+                            <a class="p-2" href="" type="submit" onclick="editUser('<%=users[i].name%>', '<%=users[i].username%>','<%=users[i].password%>')" id="edit"><i class="fas fa-pencil-alt"></i></i></a>
                         </td>
                       </tr>
                 <%}%>
-                
+                <tr class="add-user">
+                    <form action="/admin/adduser" method="post">
+                        <th scope="row"></th>
+                        <td><input class="form-control" type="text" name="newname" id="nameid" placeholder="name" required></td>
+                        <td><input class="form-control" type="text" name="newusername" id="uderid" placeholder="username" required></td>
+                        <td><input class="form-control" type="text" name="newpass" id="passid" placeholder="password" required></td>
+                        <td>
+                            <button type="submit" class="p-2" id="add" href=""><i class="fas fa-user-plus"></i></button>
+                            <a class="p-2 close" href=""><i class="fas fa-times"></i></a>
+                            
+                        </td>
+                    </form>
+                  </tr>
             </tbody>
           </table>
     </div>
 </section>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+
+<script>
+    let privousEdit=null;
+    let secondEdit=false;
+    let privName=null;
+    let privUser=null;
+    let privPass=null;
+
+    function editUser(name, username, password){
+        event.preventDefault();
+
+        if(secondEdit){
+            let document=`
+            <th scope="row"><%=[i+1]%></th>
+                        <td>${privName}</td>
+                        <td>${privUser}</td>
+                        <td>${privPass}</td>
+                        <td>
+                            <a class="p-2" href="" id="delete" ><i class="fas fa-trash"></i></a>
+                            <a class="p-2" href="" id="block"><i class="fas fa-ban"></i></i></a>
+                            <a class="p-2" href="" type="submit" onclick="editUser('privName', 'privUser','privPass')" id="edit"><i class="fas fa-pencil-alt"></i></i></a>
+                        </td>
+            `
+            privousEdit.innerHTML=document;
+        }
+
+        let tr=document.querySelector("#demo"+name);
+        let newData=`<th scope="row"><%=[i+1]%></th>
+                        <td><input type="text" value="${name}"/></td>
+                        <td><input type="text" value="${username}"/></td>
+                        <td><input type="text" value="${password}"/></td>`
+        tr.innerHTML=newData;
+
+        privName=name;
+        privUser=username;
+        privPass=password;
+        privousEdit=tr;
+        secondEdit=true;
+    }
+
+    function deleteuser(id){
+        event.preventDefault();
+        
+        $.ajax({
+            
+            
+            url : '/admin/deleteuser',
+            method : 'post',
+            data : {id : id},
+            success : ()=>{
+                alert("sucess")
+            }
+           
+
+        }),
+        function updateDiv()
+        { 
+            $( "#table" ).load(window.location.href + " #table" );
+        }
+
+
+    }
+</script>
